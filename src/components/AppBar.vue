@@ -12,11 +12,11 @@
         </div>
       </div>
       <div class="sm:hidden flex items-center gap-2">
-        <a
-          href="/get-in-touch"
+        <NuxtLink
           class="self-center px-4 py-2 rounded-lg inline-flex flex-col items-end gap-2.5 overflow-hidden text-right justify-center text-white text-sm font-semibold leading-tight bg-stone-900 hover:bg-stone-800"
+          to="mailto:connect@brightstart.com"
         >
-          Get in touch </a
+          Get in touch </NuxtLink
         ><button
           aria-label="Open menu"
           @click="async (_event) => (menuOpen = !menuOpen)"
@@ -31,23 +31,23 @@
           :key="tab.href"
           v-for="(tab, index) in tabs"
         >
-          <a
-            :href="tab.href"
+          <NuxtLink
             :class="`flex items-center text-stone-900 text-sm font-semibold leading-tight transition-border duration-300 ease-in-out border-y-[3px] ${
               path === tab.href
                 ? 'border-b-stone-900 border-t-transparent'
                 : ' border-transparent'
             }`"
-            ><span>{{ tab.label }}</span></a
+            :to="tab.href"
+            ><span>{{ tab.label }}</span></NuxtLink
           >
         </template>
       </div>
-      <a
-        href="/get-in-touch"
+      <NuxtLink
         class="self-center px-4 py-2 rounded-lg inline-flex flex-col items-end gap-2.5 overflow-hidden text-right justify-center text-white text-sm font-semibold leading-tight bg-stone-900 hover:bg-stone-800"
+        to="mailto:connect@brightstart.com"
       >
         Get in touch
-      </a>
+      </NuxtLink>
     </div>
     <template v-if="menuOpen">
       <div
@@ -57,13 +57,13 @@
           :key="tab.href"
           v-for="(tab, index) in tabs"
         >
-          <a
-            :href="tab.href"
-            @click="async (_event) => (menuOpen = false)"
+          <NuxtLink
+            :onClick="(_event) => (menuOpen = false)"
             :class="`flex items-center text-stone-900 hover:text-stone-800 text-base font-semibold leading-tight px-2 py-2 rounded transition-colors duration-200 ${
               path === tab.href ? 'bg-stone-100' : ''
             }`"
-            ><span>{{ tab.label }}</span></a
+            :to="tab.href"
+            ><span>{{ tab.label }}</span></NuxtLink
           >
         </template>
       </div>
@@ -75,6 +75,7 @@
 import { onMounted, ref } from 'vue'
 
 import { HamburgerIcon, BrandIcon } from './icons'
+import NuxtLink from '#app/components/nuxt-link'
 const tabs = [
   {
     label: 'Home',

@@ -1,39 +1,39 @@
 <template>
   <template v-if="linkAttrs.linktype === 'url'">
-    <a
+    <NuxtLink
       target="_blank"
       rel="noopener noreferrer"
-      :href="linkAttrs.href"
       :class="classFromLinkTextNode(node)"
-      >{{ node.text }}</a
+      :to="linkAttrs.href"
+      >{{ node.text }}</NuxtLink
     >
   </template>
 
   <template v-if="linkAttrs.linktype === 'story'">
-    <a
+    <NuxtLink
       target="_blank"
       rel="noopener noreferrer"
-      :href="hrefFromStoryLink(linkAttrs.href)"
       :class="classFromLinkTextNode(node)"
-      >{{ node.text }}</a
+      :to="hrefFromStoryLink(linkAttrs.href)"
+      >{{ node.text }}</NuxtLink
     >
   </template>
 
   <template v-if="linkAttrs.linktype === 'email'">
-    <a
-      :href="`mailto:${linkAttrs.href}`"
+    <NuxtLink
       :class="classFromLinkTextNode(node)"
-      >{{ node.text }}</a
+      :to="`mailto:${linkAttrs.href}`"
+      >{{ node.text }}</NuxtLink
     >
   </template>
 
   <template v-if="linkAttrs.linktype === 'asset'">
-    <a
+    <NuxtLink
       target="_blank"
       rel="noopener noreferrer"
-      :href="linkAttrs.href"
       :class="classFromLinkTextNode(node)"
-      >{{ node.text }}</a
+      :to="linkAttrs.href"
+      >{{ node.text }}</NuxtLink
     >
   </template>
 </template>
@@ -41,6 +41,7 @@
 <script setup lang="ts">
 import type { LinkAttrs, TextNode } from '../../delivery-api'
 import { classFromTextNode } from './classFromTextNode'
+import NuxtLink from '#app/components/nuxt-link'
 /**
  * Converts a story link slug to a URL path for this application.
  * `/pages/mypage` -> `/mypage`

@@ -1,42 +1,42 @@
 <template>
   <template v-if="content.link?.linktype === 'url'">
-    <a
+    <NuxtLink
       rel="noopener noreferrer"
-      :href="content.link?.cached_url"
       :target="content.link?.target"
       :class="classFromContent(content)"
+      :to="content.link?.cached_url"
       v-bind="editableAttributes(content)"
-      >{{ content.text }}</a
+      >{{ content.text }}</NuxtLink
     >
   </template>
 
   <template v-if="content.link?.linktype === 'story'">
-    <a
+    <NuxtLink
       rel="noopener noreferrer"
-      :href="hrefFromStoryLink(content.link?.cached_url)"
       :target="content.link?.target"
       :class="classFromContent(content)"
+      :to="hrefFromStoryLink(content.link?.cached_url)"
       v-bind="editableAttributes(content)"
-      >{{ content.text }}</a
+      >{{ content.text }}</NuxtLink
     >
   </template>
 
   <template v-if="content.link?.linktype === 'email'">
-    <a
-      :href="`mailto:${content.link?.email}`"
+    <NuxtLink
       :class="classFromContent(content)"
+      :to="`mailto:${content.link?.email}`"
       v-bind="editableAttributes(content)"
-      >{{ content.text }}</a
+      >{{ content.text }}</NuxtLink
     >
   </template>
 
   <template v-if="content.link?.linktype === 'asset'">
-    <a
+    <NuxtLink
       rel="noopener noreferrer"
-      :href="content.link?.cached_url"
       :class="classFromContent(content)"
+      :to="content.link?.cached_url"
       v-bind="editableAttributes(content)"
-      >{{ content.text }}</a
+      >{{ content.text }}</NuxtLink
     >
   </template>
 </template>
@@ -50,6 +50,7 @@ import type {
   StoryLinkContent,
   UrlLinkContent,
 } from '../delivery-api'
+import NuxtLink from '#app/components/nuxt-link'
 const classFromContent = (content: ButtonContent): string =>
   `self-center px-6 py-3 rounded-lg inline-flex flex-col items-end gap-3 overflow-hidden text-right justify-center text-sm font-semibold leading-tight transition-border duration-300 ease-in-out ${colorStyles(
     content,

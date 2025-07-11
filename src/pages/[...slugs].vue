@@ -1,51 +1,36 @@
 <script setup lang="ts">
-import { fetchStory } from '~/delivery-api'
 import { parseContent } from '~/content'
 import ContentView from '~/components/ContentView.vue'
 import { parseBridgeSearchParams } from '~/bridge'
 import { usePreviewedStory } from '~/pages/usePreviewedStory'
 
-const runtimeConfig = useRuntimeConfig()
-
 const route = useRoute()
 
 const slugs = computed<string[]>(() =>
-  // Can be ""
+  // The slugs can be an empty string -> []
   Array.isArray(route.params.slugs) ? route.params.slugs : [],
 )
 
-const storyblokSearchParams = computed(
-  () => parseBridgeSearchParams(route.query).value,
+const { error, data } = await useAsyncData(
+  // Re-fetch when the slugs change
+  slugs.value.join('/'),
+  async () => {
+    const result = await $fetch('/api/story', {
+      method: 'POST',
+      body: {
+        slugs: slugs.value,
+        query: route.query,
+        resolveRelations: ['teamMembers.teamMembers'],
+      },
+    }).catch((e) => {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Story not found.',
+      })
+    })
+    return result.story
+  },
 )
-
-const { error, data } = await useAsyncData('story', async () => {
-  if (!runtimeConfig.storyblokApiBaseUrl) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Storyblok API base URL is not configured.',
-    })
-  }
-  if (!runtimeConfig.storyblokDeliveryApiToken) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Storyblok Delivery API token is not configured.',
-    })
-  }
-
-  const result = await fetchStory({
-    baseUrl: runtimeConfig.storyblokApiBaseUrl,
-    slugs: slugs.value,
-    deliveryApiToken: runtimeConfig.storyblokDeliveryApiToken,
-    storyblokSearchParams: storyblokSearchParams.value,
-    resolveRelations: ['teamMembers.teamMembers'],
-  }).catch(() => {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Story not found.',
-    })
-  })
-  return result.story
-})
 
 if (error.value) {
   // If there is an error, we can handle it here or let the error component handle it
@@ -53,7 +38,7 @@ if (error.value) {
 }
 
 const previewedStory = usePreviewedStory(
-  () => storyblokSearchParams.value.version === 'draft',
+  () => parseBridgeSearchParams(route.query).value.version === 'draft',
 )
 
 const content = computed(() => {
