@@ -84,3 +84,10 @@ bun run preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+## General
+
+For issues related to the Business blueprint, please open issues at the corresponding template repository:
+
+- Nextjs: https://github.com/storyblok/blueprint-business-nextjs/issues
+- Nuxt: https://github.com/storyblok/blueprint-business-nuxt/issues
