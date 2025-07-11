@@ -20,12 +20,12 @@
             We couldn’t find the page you’re looking for.
           </p>
         </div>
-        <a
-          href="/"
+        <NuxtLink
           class="px-6 py-3 rounded-[10px] flex flex-col justify-start items-center gap-3 overflow-hidden justify-center text-white text-lg font-semibold leading-relaxed bg-stone-900 hover:bg-stone-800"
+          to="/"
         >
           Back to Home
-        </a>
+        </NuxtLink>
       </div>
       <img
         src="/404.png"
@@ -42,6 +42,7 @@
 <script setup lang="ts">
 import AppBarView from './AppBar.vue'
 import FooterView from './Footer.vue'
+import NuxtLink from '#app/components/nuxt-link'
 
 export type NotFoundPageProps = {
   className?: string
