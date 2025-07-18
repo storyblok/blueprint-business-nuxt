@@ -29,19 +29,19 @@
           mobile apps, AR/VR or voice content.
         </div>
         <div class="flex items-center gap-3">
-          <a
-            href="https://www.linkedin.com/"
+          <NuxtLink
             class="text-white"
-            ><LinkedInIcon></LinkedInIcon></a
-          ><a
-            href="https://x.com/"
+            to="https://www.linkedin.com/"
+            ><LinkedInIcon></LinkedInIcon></NuxtLink
+          ><NuxtLink
             class="text-white"
-            ><XIcon></XIcon></a
-          ><a
-            href="https://youtube.com/"
+            to="https://x.com/"
+            ><XIcon></XIcon></NuxtLink
+          ><NuxtLink
             class="text-white"
+            to="https://youtube.com/"
             ><YoutubeIcon></YoutubeIcon
-          ></a>
+          ></NuxtLink>
         </div>
       </div>
       <div
@@ -63,12 +63,12 @@
               :key="item.href"
               v-for="(item, index) in menu.items"
             >
-              <a
-                :href="item.href"
+              <NuxtLink
                 :class="`text-base font-medium leading-snug ${
                   path === item.href ? 'text-green-300' : 'text-white/70'
                 }`"
-                >{{ item.label }}</a
+                :to="item.href"
+                >{{ item.label }}</NuxtLink
               >
             </template>
           </div>
@@ -82,6 +82,7 @@
 import { onMounted, ref } from 'vue'
 
 import { YoutubeIcon, XIcon, LinkedInIcon } from './icons'
+import NuxtLink from '#app/components/nuxt-link'
 const footerMenu = [
   {
     id: 0,

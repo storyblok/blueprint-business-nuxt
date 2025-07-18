@@ -1,78 +1,51 @@
 <script setup lang="ts">
-import { fetchStory } from '~/delivery-api'
-import { parseContent } from '~/content'
-import ContentView from '~/components/ContentView.vue'
-import { parseBridgeSearchParams } from '~/bridge'
-import { usePreviewedStory } from '~/pages/usePreviewedStory'
+import { parseBridgeSearchParams } from '~/BridgeSearchParams'
+import { getStoryPath } from '~/delivery-api'
+// Parsing: uncomment the lines below to perform runtime validation of the story content
+// import { parseContent } from '~/content'
+// import { formatResult } from 'pure-parse'
 
-const runtimeConfig = useRuntimeConfig()
+const resolveRelations = ['teamMembers.teamMembers']
 
 const route = useRoute()
 
 const slugs = computed<string[]>(() =>
-  // Can be ""
+  // The slugs can be an empty string -> []
   Array.isArray(route.params.slugs) ? route.params.slugs : [],
 )
 
-const storyblokSearchParams = computed(
-  () => parseBridgeSearchParams(route.query).value,
+const bridgeSearchParams = computed(() => parseBridgeSearchParams(route.query))
+
+const story = await useAsyncStoryblok(
+  getStoryPath(slugs.value, bridgeSearchParams.value),
+  {
+    resolve_relations: resolveRelations,
+    version: bridgeSearchParams.value.version,
+    // To support internationalization in production, you'll want to adjust this;
+    //  for example, by parsing the language code from the path.
+    language:
+      bridgeSearchParams.value.version === 'draft'
+        ? bridgeSearchParams.value._storyblok_lang
+        : 'default',
+  },
 )
-
-const { error, data } = await useAsyncData('story', async () => {
-  if (!runtimeConfig.storyblokApiBaseUrl) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Storyblok API base URL is not configured.',
-    })
-  }
-  if (!runtimeConfig.storyblokDeliveryApiToken) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Storyblok Delivery API token is not configured.',
-    })
-  }
-
-  const result = await fetchStory({
-    baseUrl: runtimeConfig.storyblokApiBaseUrl,
-    slugs: slugs.value,
-    deliveryApiToken: runtimeConfig.storyblokDeliveryApiToken,
-    storyblokSearchParams: storyblokSearchParams.value,
-    resolveRelations: ['teamMembers.teamMembers'],
-  }).catch(() => {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Story not found.',
-    })
-  })
-  return result.story
-})
-
-if (error.value) {
-  // If there is an error, we can handle it here or let the error component handle it
-  throw error.value
-}
-
-const previewedStory = usePreviewedStory(
-  () => storyblokSearchParams.value.version === 'draft',
-)
-
-const content = computed(() => {
-  const result = parseContent(
-    // If the story is being previewed, use the previewed content
-    previewedStory.value ? previewedStory.value.content : data.value?.content,
-  )
-  if (result.error) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Failed to parse content.',
-    })
-  }
-  return result.value
-})
+// Parsing: uncomment the lines below to perform runtime validation of the story content
+// .then((story) => {
+//   if (!story.value) {
+//     return undefined
+//   }
+//   const contentResult = parseContent(story.value.content)
+//
+//   if (contentResult.error) {
+//     throw new Error(
+//       `Failed to parse story content: ${formatResult(contentResult)}`,
+//     )
+//   }
+//   story.value.content = contentResult.value
+//   return story
+// })
 </script>
 
 <template>
-  <ContentView :content="content" />
+  <StoryblokComponent :blok="story?.content" />
 </template>
-
-<style scoped></style>

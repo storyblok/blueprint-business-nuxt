@@ -20,6 +20,8 @@ yarn install
 bun install
 ```
 
+### Generate SSL Certificates for HTTPS
+
 Then, generate SSL certificates for local development (into `./certifcates`). This is required to run the Next.js app with HTTPS, which is required to embed the application in Storyblok:
 
 ```bash
@@ -27,7 +29,7 @@ brew install mkcert
 mkcert -key-file certificates/localhost-key.pem -cert-file certificates/localhost.pem localhost
 ```
 
-## Set up environment variables
+### Set up environment variables
 
 Copy and rename the `.env.example` file to `.env` in the root directory, then set your environment variables as needed.
 
@@ -49,38 +51,28 @@ yarn dev
 bun run dev
 ```
 
-## Production
+## About the codebase
 
-Build the application for production:
+Here follows a brief overview of the codebase:
 
-```bash
-# npm
-npm run build
+## How to add a new component
 
-# pnpm
-pnpm build
+To add a new component, you need to do three things:
 
-# yarn
-yarn build
+1. Update the content model, which describes the structure of the content with TypeScript types; see `src/content/content-model.ts`.
+2. Create a component that renders the content; see `src/storyblok/`.
 
-# bun
-bun run build
-```
+## Validation/Parsing
 
-Locally preview production build:
+This project has TypeScript types that describe the content model; however, by default, this content is not validated. To parse the content, find the comment that says `// Parsing: ` and uncomment the lines below.
 
-```bash
-# npm
-npm run preview
+You can use any validation library you prefer—this project uses [PureParse](https://pureparse.dev/) because this library allows you to [type check the parser](https://pureparse.dev/guide/why-pure-parse.html#why-pureparse).
 
-# pnpm
-pnpm preview
+In this case, when you add a new component, you will also need to update the parsing logic.
 
-# yarn
-yarn preview
+## General
 
-# bun
-bun run preview
-```
+For issues related to the Business blueprint, please open issues at the corresponding template repository:
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+- Nextjs: https://github.com/storyblok/blueprint-business-nextjs/issues
+- Nuxt: https://github.com/storyblok/blueprint-business-nuxt/issues
