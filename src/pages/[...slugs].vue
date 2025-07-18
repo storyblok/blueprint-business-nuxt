@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { parseContent } from '~/content'
-import ContentView from '~/components/ContentView.vue'
-import { parseBridgeSearchParams } from '~/bridge'
-import { usePreviewedStory } from '~/pages/usePreviewedStory'
+import { parseBridgeSearchParams } from '~/BridgeSearchParams'
+import { getStoryPath } from '~/delivery-api'
+// Parsing: uncomment the lines below to perform runtime validation of the story content
+// import { parseContent } from '~/content'
+// import { formatResult } from 'pure-parse'
+
+const resolveRelations = ['teamMembers.teamMembers']
 
 const route = useRoute()
 
@@ -11,53 +14,38 @@ const slugs = computed<string[]>(() =>
   Array.isArray(route.params.slugs) ? route.params.slugs : [],
 )
 
-const { error, data } = await useAsyncData(
-  // Re-fetch when the slugs change
-  slugs.value.join('/'),
-  async () => {
-    const result = await $fetch('/api/story', {
-      method: 'POST',
-      body: {
-        slugs: slugs.value,
-        query: route.query,
-        resolveRelations: ['teamMembers.teamMembers'],
-      },
-    }).catch((e) => {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Story not found.',
-      })
-    })
-    return result.story
+const bridgeSearchParams = computed(() => parseBridgeSearchParams(route.query))
+
+const story = await useAsyncStoryblok(
+  getStoryPath(slugs.value, bridgeSearchParams.value),
+  {
+    resolve_relations: resolveRelations,
+    version: bridgeSearchParams.value.version,
+    // To support internationalization in production, you'll want to adjust this;
+    //  for example, by parsing the language code from the path.
+    language:
+      bridgeSearchParams.value.version === 'draft'
+        ? bridgeSearchParams.value._storyblok_lang
+        : 'default',
   },
 )
-
-if (error.value) {
-  // If there is an error, we can handle it here or let the error component handle it
-  throw error.value
-}
-
-const previewedStory = usePreviewedStory(
-  () => parseBridgeSearchParams(route.query).value.version === 'draft',
-)
-
-const content = computed(() => {
-  const result = parseContent(
-    // If the story is being previewed, use the previewed content
-    previewedStory.value ? previewedStory.value.content : data.value?.content,
-  )
-  if (result.error) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Failed to parse content.',
-    })
-  }
-  return result.value
-})
+// Parsing: uncomment the lines below to perform runtime validation of the story content
+// .then((story) => {
+//   if (!story.value) {
+//     return undefined
+//   }
+//   const contentResult = parseContent(story.value.content)
+//
+//   if (contentResult.error) {
+//     throw new Error(
+//       `Failed to parse story content: ${formatResult(contentResult)}`,
+//     )
+//   }
+//   story.value.content = contentResult.value
+//   return story
+// })
 </script>
 
 <template>
-  <ContentView :content="content" />
+  <StoryblokComponent :blok="story?.content" />
 </template>
-
-<style scoped></style>

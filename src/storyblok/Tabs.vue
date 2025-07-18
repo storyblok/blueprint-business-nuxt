@@ -1,13 +1,13 @@
 <template>
   <div
     class="self-stretch flex justify-center bg-white px-4 py-8 sm:px-8 sm:py-16 md:px-20 md:py-24"
-    v-bind="editableAttributes(content)"
+    v-editable="blok"
   >
     <div
       class="flex-1 flex flex-col justify-start items-center gap-8 md:gap-14 max-w-7xl"
     >
       <div class="self-stretch flex flex-col justify-start items-center gap-2">
-        <RichTextView :node="content.description"></RichTextView>
+        <RichTextView :doc="blok.description"></RichTextView>
       </div>
       <div class="self-stretch flex flex-col items-stretch gap-4 md:gap-5">
         <div
@@ -15,7 +15,7 @@
         >
           <template
             :key="tab._uid"
-            v-for="(tab, index) in content.tabs"
+            v-for="(tab, index) in blok.tabs"
           >
             <button
               @click="async (_event) => (currentTabUid = tab._uid)"
@@ -24,7 +24,7 @@
                   ? 'bg-stone-800 text-white'
                   : 'bg-transparent text-stone-800 '
               } rounded-lg flex justify-center items-center gap-0.5`"
-              v-bind="editableAttributes(tab)"
+              v-editable="tab"
             >
               <div class="justify-center text-base font-bold leading-snug">
                 {{ tab.title }}
@@ -34,14 +34,14 @@
         </div>
         <template
           :key="content._uid"
-          v-for="(content, index) in content.tabs.find(
+          v-for="(content, index) in blok.tabs.find(
             (tab) => tab._uid === currentTabUid,
           )?.content"
         >
           <div
             class="rounded-xl md:rounded-3xl overflow-hidden flex flex-col items-stretch gap-2"
           >
-            <ContentView :content="content"></ContentView>
+            <Content :blok="content"></Content>
           </div>
         </template>
       </div>
@@ -53,14 +53,13 @@
 import { ref } from 'vue'
 
 import type { TabsContent } from '../content'
-import ContentView from './ContentView.vue'
-import RichTextView from './RichTextView'
-import { editableAttributes } from '@storyblok/preview-bridge'
+import Content from './Content.vue'
+import RichTextView from '../components/RichText.vue'
 
-export type TabsViewProps = {
-  content: TabsContent
+export type TabsProps = {
+  blok: TabsContent
 }
 
-const props = defineProps<TabsViewProps>()
-const currentTabUid = ref(props.content.tabs[0]?._uid)
+const props = defineProps<TabsProps>()
+const currentTabUid = ref(props.blok.tabs[0]?._uid)
 </script>

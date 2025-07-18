@@ -5,7 +5,26 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/fonts', '@nuxt/eslint'],
+  modules: [
+    '@nuxt/fonts',
+    '@nuxt/eslint',
+    [
+      '@storyblok/nuxt',
+      {
+        // IMPORTANT: this makes all content public, including draft content.
+        // The SDK requires the access token to be exposed to the client.
+        accessToken: process.env.STORYBLOK_DELIVERY_API_TOKEN,
+        apiOptions: {
+          /** Set the correct region for your space. Learn more: https://www.storyblok.com/docs/packages/storyblok-js#example-region-parameter */
+          region: 'eu',
+          /** The following code is only required when creating a Storyblok space directly via the Blueprints feature. */
+          endpoint: process.env.STORYBLOK_API_BASE_URL
+            ? `${new URL(process.env.STORYBLOK_API_BASE_URL).origin}/v2`
+            : undefined,
+        },
+      },
+    ],
+  ],
   srcDir: 'src',
   vite: {
     plugins: [tailwindcss()],
