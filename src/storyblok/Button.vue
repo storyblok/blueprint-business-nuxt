@@ -1,49 +1,49 @@
 <template>
-  <template v-if="content.link?.linktype === 'url'">
+  <template v-if="blok.link?.linktype === 'url'">
     <NuxtLink
       rel="noopener noreferrer"
-      :target="content.link?.target"
-      :class="classFromContent(content)"
-      :to="content.link?.cached_url"
-      v-bind="editableAttributes(content)"
-      >{{ content.text }}</NuxtLink
+      :target="blok.link?.target"
+      :class="classFromContent(blok)"
+      :to="blok.link?.cached_url"
+      v-editable="blok"
+      >{{ blok.text }}</NuxtLink
     >
   </template>
 
-  <template v-if="content.link?.linktype === 'story'">
+  <template v-if="blok.link?.linktype === 'story'">
     <NuxtLink
       rel="noopener noreferrer"
-      :target="content.link?.target"
-      :class="classFromContent(content)"
-      :to="hrefFromStoryLink(content.link?.cached_url)"
-      v-bind="editableAttributes(content)"
-      >{{ content.text }}</NuxtLink
+      :target="blok.link?.target"
+      :class="classFromContent(blok)"
+      :to="hrefFromStoryLink(blok.link?.cached_url)"
+      v-editable="blok"
+      >{{ blok.text }}</NuxtLink
     >
   </template>
 
-  <template v-if="content.link?.linktype === 'email'">
+  <template v-if="blok.link?.linktype === 'email'">
     <NuxtLink
-      :class="classFromContent(content)"
-      :to="`mailto:${content.link?.email}`"
-      v-bind="editableAttributes(content)"
-      >{{ content.text }}</NuxtLink
+      :class="classFromContent(blok)"
+      :to="`mailto:${blok.link?.email}`"
+      v-editable="blok"
+      >{{ blok.text }}</NuxtLink
     >
   </template>
 
-  <template v-if="content.link?.linktype === 'asset'">
+  <template v-if="blok.link?.linktype === 'asset'">
     <NuxtLink
       rel="noopener noreferrer"
-      :class="classFromContent(content)"
-      :to="content.link?.cached_url"
-      v-bind="editableAttributes(content)"
-      >{{ content.text }}</NuxtLink
+      :class="classFromContent(blok)"
+      :to="blok.link?.cached_url"
+      v-editable="blok"
+      >{{ blok.text }}</NuxtLink
     >
   </template>
 </template>
 
 <script setup lang="ts">
 import type { ButtonContent } from '../content'
-import { editableAttributes } from '@storyblok/preview-bridge'
+
 import type {
   AssetLinkContent,
   EmailLinkContent,
@@ -71,9 +71,9 @@ const colorStyles = (content: ButtonContent): string => {
 const hrefFromStoryLink = (slugs: string): string =>
   '/' + slugs.split('/').slice(1).join('/')
 
-export type ButtonViewProps = {
-  content: ButtonContent
+export type ButtonProps = {
+  blok: ButtonContent
 }
 
-const props = defineProps<ButtonViewProps>()
+const props = defineProps<ButtonProps>()
 </script>
